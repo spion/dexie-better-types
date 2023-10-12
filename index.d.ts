@@ -8,7 +8,8 @@ import type {
   IndexableTypeArrayReadonly,
   TableHooks,
   TableSchema,
-  ThenShortcut
+  ThenShortcut,
+  PromiseExtended
 } from 'dexie'
 
 export type KeyPaths<T> = {
@@ -75,76 +76,76 @@ export interface Table<T = any, TKey = any, TInsertType = T> {
   hook: TableHooks<T, TKey>
   core: DBCoreTable
 
-  get(key: TKey): Promise<T | undefined>
-  get<R>(key: TKey, thenShortcut: ThenShortcut<T | undefined, R>): Promise<R>
-  get(equalityCriterias: Partial<T>): Promise<T | undefined>
-  get<R>(equalityCriterias: Partial<T>, thenShortcut: ThenShortcut<T | undefined, R>): Promise<R>
+  get(key: TKey): PromiseExtended<T | undefined>
+  get<R>(key: TKey, thenShortcut: ThenShortcut<T | undefined, R>): PromiseExtended<R>
+  get(equalityCriterias: Partial<T>): PromiseExtended<T | undefined>
+  get<R>(equalityCriterias: Partial<T>, thenShortcut: ThenShortcut<T | undefined, R>): PromiseExtended<R>
   where<K extends KeysOf<T>>(index: K): WhereClause<T, K, TKey>
   where(equalityCriterias: Partial<T>): Collection<T, TKey>
 
   filter(fn: (obj: T) => boolean): Collection<T, TKey>
 
-  count(): Promise<number>
-  count<R>(thenShortcut: ThenShortcut<number, R>): Promise<R>
+  count(): PromiseExtended<number>
+  count<R>(thenShortcut: ThenShortcut<number, R>): PromiseExtended<R>
 
   offset(n: number): Collection<T, TKey>
 
   limit(n: number): Collection<T, TKey>
 
-  each(callback: (obj: T, cursor: { key: any; primaryKey: TKey }) => any): Promise<void>
+  each(callback: (obj: T, cursor: { key: any; primaryKey: TKey }) => any): PromiseExtended<void>
 
-  toArray(): Promise<Array<T>>
-  toArray<R>(thenShortcut: ThenShortcut<T[], R>): Promise<R>
+  toArray(): PromiseExtended<Array<T>>
+  toArray<R>(thenShortcut: ThenShortcut<T[], R>): PromiseExtended<R>
 
   toCollection(): Collection<T, TKey>
   orderBy(index: KeysOf<T>): Collection<T, TKey>
   reverse(): Collection<T, TKey>
   mapToClass(constructor: Function): Function
-  add(item: TInsertType, key?: TKey): Promise<TKey>
+  add(item: TInsertType, key?: TKey): PromiseExtended<TKey>
   update(
     key: TKey | T,
     changes:
       | UpdateSpec<T>
       | ((obj: T, ctx: { value: any; primKey: IndexableType }) => void | boolean)
-  ): Promise<number>
-  put(item: TInsertType, key?: TKey): Promise<TKey>
-  delete(key: TKey): Promise<void>
-  clear(): Promise<void>
-  bulkGet(keys: TKey[]): Promise<(T | undefined)[]>
+  ): PromiseExtended<number>
+  put(item: TInsertType, key?: TKey): PromiseExtended<TKey>
+  delete(key: TKey): PromiseExtended<void>
+  clear(): PromiseExtended<void>
+  bulkGet(keys: TKey[]): PromiseExtended<(T | undefined)[]>
 
   bulkAdd<B extends boolean>(
     items: readonly TInsertType[],
     keys: IndexableTypeArrayReadonly,
     options: { allKeys: B }
-  ): Promise<B extends true ? TKey[] : TKey>
+  ): PromiseExtended<B extends true ? TKey[] : TKey>
   bulkAdd<B extends boolean>(
     items: readonly TInsertType[],
     options: { allKeys: B }
-  ): Promise<B extends true ? TKey[] : TKey>
+  ): PromiseExtended<B extends true ? TKey[] : TKey>
   bulkAdd(
     items: readonly TInsertType[],
     keys?: IndexableTypeArrayReadonly,
     options?: { allKeys: boolean }
-  ): Promise<TKey>
+  ): PromiseExtended<TKey>
 
   bulkPut<B extends boolean>(
     items: readonly TInsertType[],
     keys: IndexableTypeArrayReadonly,
     options: { allKeys: B }
-  ): Promise<B extends true ? TKey[] : TKey>
+  ): PromiseExtended<B extends true ? TKey[] : TKey>
   bulkPut<B extends boolean>(
     items: readonly TInsertType[],
     options: { allKeys: B }
-  ): Promise<B extends true ? TKey[] : TKey>
+  ): PromiseExtended<B extends true ? TKey[] : TKey>
   bulkPut(
     items: readonly TInsertType[],
     keys?: IndexableTypeArrayReadonly,
     options?: { allKeys: boolean }
-  ): Promise<TKey>
+  ): PromiseExtended<TKey>
 
-  bulkUpdate(keysAndChanges: ReadonlyArray<{ key: TKey; changes: UpdateSpec<T> }>): Promise<number>
+  bulkUpdate(keysAndChanges: ReadonlyArray<{ key: TKey; changes: UpdateSpec<T> }>): PromiseExtended<number>
 
-  bulkDelete(keys: TKey[]): Promise<void>
+  bulkDelete(keys: TKey[]): PromiseExtended<void>
 }
 
 export interface WhereClause<T, Key extends KeysOf<T>, TKey = IndexableType> {
@@ -185,8 +186,8 @@ export interface Collection<T = any, TKey = IndexableType> {
   //db: Database;
   and(filter: (x: T) => boolean): Collection<T, TKey>
   clone(props?: Object): Collection<T, TKey>
-  count(): Promise<number>
-  count<R>(thenShortcut: ThenShortcut<number, R>): Promise<R>
+  count(): PromiseExtended<number>
+  count<R>(thenShortcut: ThenShortcut<number, R>): PromiseExtended<R>
   distinct(): Collection<T, TKey>
   each(
     callback: (
@@ -196,7 +197,7 @@ export interface Collection<T = any, TKey = IndexableType> {
         primaryKey: TKey
       }
     ) => any
-  ): Promise<void>
+  ): PromiseExtended<void>
   eachKey(
     callback: (
       key: IndexableType,
@@ -205,7 +206,7 @@ export interface Collection<T = any, TKey = IndexableType> {
         primaryKey: TKey
       }
     ) => any
-  ): Promise<void>
+  ): PromiseExtended<void>
   eachPrimaryKey(
     callback: (
       key: TKey,
@@ -214,7 +215,7 @@ export interface Collection<T = any, TKey = IndexableType> {
         primaryKey: TKey
       }
     ) => any
-  ): Promise<void>
+  ): PromiseExtended<void>
   eachUniqueKey(
     callback: (
       key: IndexableType,
@@ -223,30 +224,30 @@ export interface Collection<T = any, TKey = IndexableType> {
         primaryKey: TKey
       }
     ) => any
-  ): Promise<void>
+  ): PromiseExtended<void>
   filter(filter: (x: T) => boolean): Collection<T, TKey>
-  first(): Promise<T | undefined>
-  first<R>(thenShortcut: ThenShortcut<T | undefined, R>): Promise<R>
-  keys(): Promise<IndexableTypeArray>
-  keys<R>(thenShortcut: ThenShortcut<IndexableTypeArray, R>): Promise<R>
-  primaryKeys(): Promise<TKey[]>
-  primaryKeys<R>(thenShortcut: ThenShortcut<TKey[], R>): Promise<R>
-  last(): Promise<T | undefined>
-  last<R>(thenShortcut: ThenShortcut<T | undefined, R>): Promise<R>
+  first(): PromiseExtended<T | undefined>
+  first<R>(thenShortcut: ThenShortcut<T | undefined, R>): PromiseExtended<R>
+  keys(): PromiseExtended<IndexableTypeArray>
+  keys<R>(thenShortcut: ThenShortcut<IndexableTypeArray, R>): PromiseExtended<R>
+  primaryKeys(): PromiseExtended<TKey[]>
+  primaryKeys<R>(thenShortcut: ThenShortcut<TKey[], R>): PromiseExtended<R>
+  last(): PromiseExtended<T | undefined>
+  last<R>(thenShortcut: ThenShortcut<T | undefined, R>): PromiseExtended<R>
   limit(n: number): Collection<T, TKey>
   offset(n: number): Collection<T, TKey>
   or<K extends KeysOf<T>>(indexOrPrimayKey: K): WhereClause<T, K, TKey>
   raw(): Collection<T, TKey>
   reverse(): Collection<T, TKey>
-  sortBy(keyPath: string): Promise<T[]>
-  sortBy<R>(keyPath: string, thenShortcut: ThenShortcut<T[], R>): Promise<R>
-  toArray(): Promise<Array<T>>
-  toArray<R>(thenShortcut: ThenShortcut<T[], R>): Promise<R>
-  uniqueKeys(): Promise<IndexableTypeArray>
-  uniqueKeys<R>(thenShortcut: ThenShortcut<IndexableTypeArray, R>): Promise<R>
+  sortBy(keyPath: string): PromiseExtended<T[]>
+  sortBy<R>(keyPath: string, thenShortcut: ThenShortcut<T[], R>): PromiseExtended<R>
+  toArray(): PromiseExtended<Array<T>>
+  toArray<R>(thenShortcut: ThenShortcut<T[], R>): PromiseExtended<R>
+  uniqueKeys(): PromiseExtended<IndexableTypeArray>
+  uniqueKeys<R>(thenShortcut: ThenShortcut<IndexableTypeArray, R>): PromiseExtended<R>
   until(filter: (value: T) => boolean, includeStopEntry?: boolean): Collection<T, TKey>
   // Mutating methods
-  delete(): Promise<number>
+  delete(): PromiseExtended<number>
   modify(
     changeCallback: (
       obj: T,
@@ -254,6 +255,6 @@ export interface Collection<T = any, TKey = IndexableType> {
         value: T
       }
     ) => void | boolean
-  ): Promise<number>
-  modify(changes: { [keyPath: string]: any }): Promise<number>
+  ): PromiseExtended<number>
+  modify(changes: { [keyPath: string]: any }): PromiseExtended<number>
 }
